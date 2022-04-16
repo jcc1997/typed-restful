@@ -24,9 +24,9 @@ export const defineRoute: DefineRoute = function (method, route, cb) {
 };
 
 export const createService: CreateService = function (routes) {
-  const run = async function (method: string, url: string, request: any) {
+  const run = function (method: string, url: string, request: any) {
     const paths = url.split("/").filter((v) => !!v);
-    const result = await get(routes, paths);
+    const result = get(routes, paths);
     if (result && result[method]) {
       return result[method](request);
     }
