@@ -85,12 +85,12 @@ export type Service<
   run<
     M extends keyof Handlers,
     R extends Overlap extends never ? never : string,
-    Req extends Handler extends (...args: any) => any
+    Req extends (Handler extends ((...args: any) => any)
       ? Parameters<Handler>[0]
-      : never,
-    Resp extends Handler extends (...args: any) => any
+      : never),
+    Resp extends (Handler extends ((...args: any) => any)
       ? ReturnType<Handler>
-      : never,
+      : never),
     Overlap = RoutePattern<R> & keyof FRoutes,
     Handlers = Overlap extends keyof FRoutes ? FRoutes[Overlap] : never,
     Handler = Handlers[M]
@@ -101,12 +101,12 @@ export type Service<
   ): Promise<Resp>;
   get<
     R extends Overlap extends never ? never : string,
-    Req extends Handler extends (...args: any) => any
+    Req extends (Handler extends ((...args: any) => any)
       ? Parameters<Handler>[0]
-      : never,
-    Resp extends Handler extends (...args: any) => any
+      : never),
+    Resp extends (Handler extends ((...args: any) => any)
       ? ReturnType<Handler>
-      : never,
+      : never),
     Overlap = RoutePattern<R> & keyof FRoutes,
     Handlers = Overlap extends keyof FRoutes ? FRoutes[Overlap] : never,
     Handler = "GET" extends keyof Handlers ? Handlers["GET"] : never
@@ -116,12 +116,12 @@ export type Service<
   ): Promise<Resp>;
   post<
     R extends Overlap extends never ? never : string,
-    Req extends Handler extends (...args: any) => any
+    Req extends (Handler extends ((...args: any) => any)
       ? Parameters<Handler>[0]
-      : never,
-    Resp extends Handler extends (...args: any) => any
+      : never),
+    Resp extends (Handler extends ((...args: any) => any)
       ? ReturnType<Handler>
-      : never,
+      : never),
     Overlap = RoutePattern<R> & keyof FRoutes,
     Handlers = Overlap extends keyof FRoutes ? FRoutes[Overlap] : never,
     Handler = "POST" extends keyof Handlers ? Handlers["POST"] : never
