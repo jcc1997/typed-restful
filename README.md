@@ -1,115 +1,76 @@
-# hook-di
+# restful
 
-one of the results cause by reconsidering design pattern in hook style programming.
+## purpose
 
-highly inspired by vue composition apis.
+REST(Representational State Transfer) RESTful is always used in HTTP api design.
+
+Here is a tool of using it in common service design, and of course support typescript.
 
 ## usage
 
-here is the `interface`s
+### defineRoute
+
+just like define a server router
 
 ```typescript
-interface IServiceA {
-  a: string;
-  hello(): string;
-}
+import { defineRoute, merge } from "restful";
 
-interface IServiceB {
-  b: string;
-  hello(): string;
-}
-```
-
-to turn typescript interfaces to a real JS object, use type `InjectionKey` and `Symbol`.
-
-```typescript
-import type { InjectionKey } from "hook-di"; // completely equal to { InjectionKey } from 'vue'
-const IServiceA: InjectionKey<IServiceA> = Symbol("store a");
-const IServiceB: InjectionKey<IServiceB> = Symbol("store b");
-```
-
-define implements to interfaces
-
-```typescript
-function createServiceB(): IServiceB {
-  return {
-    b: "storeb",
-    hello() {
-      return "storeb";
-    },
-  };
-}
-
-function createServiceA(): IServiceA {
-  const storeB = dInject(IServiceB);
-  return {
-    a: "storea",
-    hello() {
-      return storeB.hello() + "storea";
-    },
-  };
-}
-```
-
-manually provide dependencies and auto inject.
-
-```typescript
-import { dInject, dProvide, createDIScope, getCurrentScope } from "../src";
-
-function main() {
-      
-    dProvide(IServiceA, createServiceA);
-    dProvide(IServiceB, createServiceB);
-
-    const serviceA = dInject(IServiceA);
-    serviceA.hello(); // "storebstorea"
-
-    // if want to pass the scope, use getCurrentScope
-    const scope = getCurrentScope()!;
-    setTimeout(() => {
-        scope.run(() => {
-            const serviceB = dInject(IServiceB);
-            serviceB.hello(); // "storeb"
-        });
-    }, 1000);
-}
-// use scope to create isolated contexts
-createDIScope().run(main);
-```
-
-## use in `vue`
-
-```typescript
-import { createDIScope, useDInject, useDProvide } from "hook-di/vue";
-
-const app = createApp({
-    setup() {
-        useDProvide(IServiceA, createServiceA);
-        useDProvide(IServiceB, createServiceB);
-
-        const serviceA = useDInject(IServiceA);
-        const serviceB = useDInject(IServiceB);
-    }
+// const routeA: {
+//     topic: {
+//         ":id": {
+//             GET: () => void;
+//         };
+//     };
+// }
+const route1 = defineRoute("GET", "/topic/:id", (request: string) => {
+  return 123;
 });
-app.use(createDIScope());
-app.mount("#app");
+const route2 = defineRoute("POST", "/topic/:id", () => {});
+const route3 = defineRoute("GET", "/topic", () => {});
+const route4 = defineRoute("GET", "/file", (req?: {}) => {});
+
+const routes = merge(route1, route2, route3, route4);
 ```
 
-or
+### createSerivce
+
+from routes create service
 
 ```typescript
-import HookDi, { useDInject, useDProvide } from "hook-di/vue";
+import { createService } from "restful";
 
-const app = createApp({
-    setup() {
-        const serviceA = useDInject(IServiceA);
-        const serviceB = useDInject(IServiceB);
-    }
-});
-// isolated context created in here
-app.use(createDIScope(), () => {
-    useDProvide(IServiceA, createServiceA);
-    useDProvide(IServiceB, createServiceB);
-});
-app.mount("#app");
+
+const service = createService(routes);
+service.run("GET", "/file", undefined);
+service.get("/file", undefined);
+// @ts-expect-error
+service.post("/file", undefined);
+service.run("GET", "/topic/123", "123").then((v) => {});
+// @ts-expect-error
+service.run("GET", "/topic/123", 123).then((v) => {});
+service.get("/topic/123", "123").then((v) => {});
 ```
+
+<!-- ### middleware
+
+you can add middleware to every route
+
+```typescript
+import { createService } from "restful";
+
+const service = createService(routes, [async function (request, next) {
+  // you can do something to options
+  const response = await next(request);
+  // you can do something to response
+  return response;
+}]);
+
+// add service by fork a new service
+
+const forked = service.fork([async function (request, next) {
+  // you can do something to options
+  const response = await next(request);
+  // you can do something to response
+  return response;
+}]);
+``` -->

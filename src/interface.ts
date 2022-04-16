@@ -1,7 +1,7 @@
 export type DefineRoute = <
-M extends Method,
-R extends string,
-Handler extends (request: any) => any
+  M extends Method,
+  R extends string,
+  Handler extends (request: any) => any
 >(
   method: M,
   route: R,
@@ -9,8 +9,11 @@ Handler extends (request: any) => any
 ) => PathRecord<M, RemoveSlash<R>, Handler>;
 
 export type CreateService = <T extends Record<string, any>>(
-  routes: T
+  routes: T,
+  middlewares?: Middleware[]
 ) => Service<T>;
+
+export type Method = "GET" | "POST";
 
 /** type utils */
 type MapTopParameter<U> = U extends any ? (arg: U) => void : never;
@@ -34,8 +37,6 @@ type RemoveSlash<T extends string> = T extends `/${infer S}` ? S : T;
 type AddSlash<T extends string> = T extends `/${infer S}` ? T : `/${T}`;
 
 /** type function */
-
-type Method = "GET" | "POST";
 
 type PathRecord<
   M extends Method,
@@ -77,7 +78,10 @@ type FlattenRoutes<T extends Record<string, any>> = IntersectionFromUnion<
 
 /** type defination */
 
-type Service<T extends Record<string, any>, FRoutes = FlattenRoutes<T>> = {
+export type Service<
+  T extends Record<string, any>,
+  FRoutes = FlattenRoutes<T>
+> = {
   run<
     M extends keyof Handlers,
     R extends Overlap extends never ? never : string,
@@ -125,4 +129,11 @@ type Service<T extends Record<string, any>, FRoutes = FlattenRoutes<T>> = {
     url: R,
     request: Req
   ): Promise<Resp>;
+  fork(middlewares: Middleware[]): Service<T>;
 };
+
+export type Middleware<Request = any, Response = any> = (
+  request: Request,
+  info: { method: Method; url: string },
+  next: (request: any) => Promise<any>
+) => Promise<Response>;

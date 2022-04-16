@@ -1,5 +1,5 @@
 import { deepmerge } from "deepmerge-ts";
-import { DefineRoute, CreateService } from "./interface";
+import { DefineRoute, CreateService, Middleware, Method } from "./interface";
 import { get, checkRoutes } from "./utils";
 export const merge: typeof deepmerge = function (...args) {
   const routes = deepmerge(...args);
@@ -23,12 +23,25 @@ export const defineRoute: DefineRoute = function (method, route, cb) {
   return result as ReturnType<DefineRoute>;
 };
 
-export const createService: CreateService = function (routes) {
-  const run = function (method: string, url: string, request: any) {
+export const createService: CreateService = function (
+  routes,
+  middlewares = []
+) {
+  const run = function (method: Method, url: string, request: any) {
     const paths = url.split("/").filter((v) => !!v);
     const result = get(routes, paths);
     if (result && result[method]) {
-      return result[method](request);
+      function dispatch(
+        i: number, info: { method: Method; url: string }
+      ): (request: any) => Promise<any> {
+        if (i === middlewares.length) {
+          return (req) => result[method](req);
+        } else {
+          const mid = middlewares[i];
+          return (req) => mid(req, info, dispatch(i + 1, info));
+        }
+      }
+      return dispatch(0, { method, url })(request);
     }
     throw new Error("no matcher");
   };
@@ -39,6 +52,9 @@ export const createService: CreateService = function (routes) {
     },
     post(...args: any[]) {
       return (run as any)("POST", ...args);
+    },
+    fork(addMids: Middleware[]) {
+      return createService(routes, middlewares.slice(0).concat(addMids));
     },
   } as any;
 };

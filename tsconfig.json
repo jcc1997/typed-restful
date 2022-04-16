@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "ESNext",
+    "target": "esnext",
+    "module": "esnext",
 
     /* Basic Options */
     "isolatedModules": true,
