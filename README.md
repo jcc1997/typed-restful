@@ -13,7 +13,7 @@ Here is a tool of using it in common service design, and of course support types
 just like define a server router
 
 ```typescript
-import { defineRoute, merge } from "restful";
+import { defineRoute, merge } from "typed-restful";
 
 // const routeA: {
 //     topic: {
@@ -37,7 +37,7 @@ const routes = merge(route1, route2, route3, route4);
 from routes create service
 
 ```typescript
-import { createService } from "restful";
+import { createService } from "typed-restful";
 
 
 const service = createService(routes);
@@ -56,7 +56,7 @@ service.get("/topic/123", "123").then((v) => {});
 you can add middleware to every route
 
 ```typescript
-import { createService } from "restful";
+import { createService } from "typed-restful";
 
 const service = createService(routes, [async function (request, next) {
   // you can do something to options

@@ -1,5 +1,5 @@
-import "../src/index";
-import { createService, defineRoute, merge } from "../src/index";
+import "./index";
+import { createService, defineRoute, merge } from "./index";
 
 // const routeA: {
 //     topic: {
