@@ -1,4 +1,4 @@
-# restful
+# typed-restful
 
 ## purpose
 

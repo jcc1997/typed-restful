@@ -29,7 +29,7 @@
       ]
     }
   },
-  "repository": "https://github.com/jcc1997/restful",
+  "repository": "https://github.com/jcc1997/typed-restful",
   "keywords": [
     "typescript",
     "restful"
