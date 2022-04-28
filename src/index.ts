@@ -27,7 +27,7 @@ export const createService: CreateService = function (
   routes,
   middlewares = []
 ) {
-  const run = function (method: Method, url: string, request: any) {
+  const run = async function (method: Method, url: string, request: any) {
     const paths = url.split("/").filter((v) => !!v);
     const $collections = {};
     const result = get(routes, paths, $collections);
