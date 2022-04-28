@@ -8,7 +8,7 @@ import { createService, defineRoute, merge } from "./index";
 //         };
 //     };
 // }
-const route1 = defineRoute("GET", "/topic/:id", (request: string) => {
+const route1 = defineRoute("GET", "/topic/:id", (request: string, { id }: { id: string }) => {
   return 123;
 });
 const route2 = defineRoute("POST", "/topic/:id", () => {});

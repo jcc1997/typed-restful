@@ -1,7 +1,7 @@
 export type DefineRoute = <
   M extends Method,
   R extends string,
-  Handler extends (request: any) => any
+  Handler extends (request: any, vars?: any) => any
 >(
   method: M,
   route: R,

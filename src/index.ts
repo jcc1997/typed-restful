@@ -29,13 +29,14 @@ export const createService: CreateService = function (
 ) {
   const run = function (method: Method, url: string, request: any) {
     const paths = url.split("/").filter((v) => !!v);
-    const result = get(routes, paths);
+    const $collections = {};
+    const result = get(routes, paths, $collections);
     if (result && result[method]) {
       function dispatch(
         i: number, info: { method: Method; url: string }
       ): (request: any) => Promise<any> {
         if (i === middlewares.length) {
-          return (req) => result[method](req);
+          return (req) => result[method](req, $collections);
         } else {
           const mid = middlewares[i];
           return (req) => mid(req, info, dispatch(i + 1, info));

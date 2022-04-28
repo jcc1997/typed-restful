@@ -7,19 +7,21 @@ export function findMatchers(path: string, keys: string[]) {
   return keys.filter((v) => is$(v) || path === v);
 }
 
-export function get(obj: any, paths: string[]): any {
+export function get(obj: any, paths: string[], $collections: Record<string, any>): any {
   if (paths.length < 1) return undefined;
   const matchers = findMatchers(paths[0], Object.keys(obj));
   if (matchers.length < 1) return undefined;
   if (paths.length === 1) {
-    for (let i = 0; i < matchers.length; i++) {
-      return obj[matchers[0]];
-    }
+    if (is$(matchers[0])) $collections[matchers[0].slice(1)] = paths[0];
+    return obj[matchers[0]];
   } else {
     let result;
     for (let i = 0; i < matchers.length; i++) {
-      result = get(obj[matchers[i]], paths.slice(1));
-      if (result) return result;
+      result = get(obj[matchers[i]], paths.slice(1), $collections);
+      if (result) {
+        if (is$(matchers[i])) $collections[matchers[i].slice(1)] = paths[0];
+        return result;
+      }
     }
   }
   return undefined;

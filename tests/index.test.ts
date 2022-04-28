@@ -9,7 +9,10 @@ describe("di tests", () => {
     topic: {
       GET: () => undefined,
       ":id": {
-        GET: (request: string) => 1,
+        GET: (request: string, { id }: { id: string }) => {
+          expect(id).toEqual('123');
+          return 1;
+        },
         POST: () => undefined,
       },
     },
@@ -19,8 +22,10 @@ describe("di tests", () => {
   };
 
   it("should work", () => {
-    const result = get(routes, ["topic", "123"]);
+    const $collections = {};
+    const result = get(routes, ["topic", "123"], $collections);
     expect(result).toBe(routes["topic"][":id"]);
+    expect($collections).toEqual({ id: '123' });
   });
 
   it("should work 2", async () => {
